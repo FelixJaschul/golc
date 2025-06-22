@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <SDL2/SDL.h>
 
 #define WIDTH 80
@@ -8,7 +9,7 @@ typedef struct State {
     SDL_Window *window;
     SDL_Renderer *renderer;
     int grid[HEIGHT][WIDTH];
-    int running;
+    bool running;
 } state_t;
 
 state_t state;
@@ -81,11 +82,11 @@ int main() {
     state.window = SDL_CreateWindow("GOL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE,SDL_WINDOW_SHOWN);
     state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED);
 
-    state.running = 1;
+    state.running = true;
     while (state.running) {
         SDL_Event ev;
         while (SDL_PollEvent(&ev)) {
-            if (ev.type == SDL_QUIT) state.running = 0;
+            if (ev.type == SDL_QUIT) state.running = false;
         }
 
         render_grid();
