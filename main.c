@@ -17,12 +17,14 @@ void render_grid() {
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
             SDL_Rect cell = {x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE};
+
             if (state.grid[y][x])
                 SDL_SetRenderDrawColor(state.renderer, 0, 150, 0, 255);
             else if ((x + y) % 2)
                 SDL_SetRenderDrawColor(state.renderer, 20, 20, 20, 255);
             else
                 SDL_SetRenderDrawColor(state.renderer, 0, 0, 0, 255);
+
             SDL_RenderFillRect( state.renderer, &cell);
         }
     }
@@ -30,20 +32,30 @@ void render_grid() {
 
 void update_grid() {
     int new_grid[HEIGHT][WIDTH] = {0};
+
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
             int neighbors = 0;
+
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dx = -1; dx <= 1; dx++) {
                     if (dx || dy) {
                         const int ny = y + dy;
                         const int nx = x + dx;
-                        if (ny >= 0 && ny < HEIGHT && nx >= 0 && nx < WIDTH) {
+                        if (ny >= 0
+                                && ny < HEIGHT
+                                && nx >= 0
+                                && nx < WIDTH) {
                             neighbors += state.grid[ny][nx];
                         }
                     }
                 }
             }
+
+            // Apply Conway's Game of Life rules
+            // 1. Any live cell with 2 or 3 live neighbors survives
+            // 2. Any dead cell with exactly 3 live neighbors becomes alive
+            // 3. All other cells die or stay dead
             new_grid[y][x] = neighbors == 3 || (state.grid[y][x] && neighbors == 2);
         }
     }
