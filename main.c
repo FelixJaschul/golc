@@ -10,6 +10,11 @@ typedef struct State {
     SDL_Renderer *renderer;
     int grid[HEIGHT][WIDTH];
     bool running;
+    bool paused;
+
+    struct Mouse {
+        int x, y;
+    } mouse;
 } state_t;
 
 state_t state;
@@ -67,7 +72,14 @@ void update_grid() {
         }
     }
 
+    // Update mouse pos
+    int mx, my;
+    SDL_GetMouseState(&mx, &my);
+    state.mouse.y = my / CELL_SIZE;
+    state.mouse.x = mx / CELL_SIZE;
+
     // Paste updated grid into viewable grid
+    if (state.paused) return;
     for (int y = 0; y < HEIGHT; y++) {
         memcpy(state.grid[y], new_grid[y], WIDTH * sizeof(int));
     }
@@ -87,16 +99,21 @@ int main() {
     state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED);
 
     state.running = true;
+    state.paused = false;
     while (state.running) {
         SDL_Event ev;
         while (SDL_PollEvent(&ev)) {
             if (ev.type == SDL_QUIT) state.running = false;
+            if (ev.type == SDL_MOUSEBUTTONDOWN) state.grid[state.mouse.y][state.mouse.x] = 1;
+            if (ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_SPACE) {state.paused = !state.paused; printf("PAUSED"); };
         }
 
         render_grid();
         SDL_RenderPresent(state.renderer);
         SDL_Delay(200);
         update_grid();
+
+        printf("MOUSE POS: %d / %d \n", state.mouse.x, state.mouse.y);
     }
 
     // Clean up
@@ -106,4 +123,3 @@ int main() {
 
     return 0;
 }
-
