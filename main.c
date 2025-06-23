@@ -83,6 +83,7 @@ void update_grid() {
     for (int y = 0; y < HEIGHT; y++) {
         memcpy(state.grid[y], new_grid[y], WIDTH * sizeof(int));
     }
+    free(new_grid);
 }
 
 void init() {
@@ -102,6 +103,7 @@ void init() {
 
 void deinit() {
     // Clean up
+    free(state.grid);
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
     SDL_Quit();
@@ -124,7 +126,13 @@ int main() {
                     switch (ev.key.keysym.sym) {
                         case SDLK_SPACE:
                             state.paused = !state.paused;
-                            printf("PAUSED");
+                            printf("PAUSED\n");
+                            break;
+                        case SDLK_RETURN:
+                            state.paused = !state.paused;
+                            update_grid();
+                            printf("UPDATED ONCE\n");
+                            state.paused = !state.paused;
                             break;
                     }
             }
@@ -135,7 +143,7 @@ int main() {
         SDL_Delay(200);
         update_grid();
 
-        printf("MOUSE POS: %d / %d \n", state.mouse.x, state.mouse.y);
+        printf("MOUSE POS: %d / %d\n", state.mouse.x, state.mouse.y);
     }
     deinit();
     return 0;
