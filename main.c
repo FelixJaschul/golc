@@ -83,7 +83,6 @@ void update_grid() {
     for (int y = 0; y < HEIGHT; y++) {
         memcpy(state.grid[y], new_grid[y], WIDTH * sizeof(int));
     }
-    free(new_grid);
 }
 
 void init() {
@@ -103,7 +102,6 @@ void init() {
 
 void deinit() {
     // Clean up
-    free(state.grid);
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
     SDL_Quit();
