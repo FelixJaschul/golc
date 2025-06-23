@@ -20,14 +20,14 @@ int getNeighbors(const int y, const int x) {
     for (int dy = -1; dy <= 1; dy++) {
         for (int dx = -1; dx <= 1; dx++) {
             if (dx != 0 || dy != 0) {
-                int ny = y + dy;
-                int nx = x + dx;
+                const int ny = y + dy;
+                const int nx = x + dx;
                 if (ny >= 0
                         && ny < HEIGHT
                         && nx >= 0
                         && nx < WIDTH) {
                     neighbors += state.grid[ny][nx];
-                        }
+                }
             }
         }
     }
@@ -52,7 +52,6 @@ void render_grid() {
 }
 
 void update_grid() {
-    // Alloc ram and fill with 0
     int new_grid[HEIGHT][WIDTH];
     memset(new_grid, 0, sizeof(new_grid));
 
@@ -75,7 +74,6 @@ void update_grid() {
 }
 
 int main() {
-    // Alloc ram and fill with 0
     memset(state.grid, 0, sizeof(state.grid));
 
     // Initialize with a simple pattern (glider)
