@@ -92,12 +92,20 @@ void init() {
     state.running = true;
     state.paused = true;
 
-    // Initialize with a simple pattern (glider)
-    state.grid[1][2] =
-        state.grid[2][3] =
-            state.grid[3][1] =
-                state.grid[3][2] =
-                    state.grid[3][3] = 1;
+    // Initialize with a simple pattern (ship)
+    state.grid[16][33] =
+        state.grid[17][33] =
+            state.grid[18][33] =
+                state.grid[19][33] =
+        state.grid[17][34] =
+            state.grid[18][34] =
+                state.grid[19][34] =
+        state.grid[17][35] =
+            state.grid[18][35] =
+                state.grid[19][35] =
+        state.grid[17][36] =
+            state.grid[18][36] =
+                state.grid[19][36] = 1;
 }
 
 void deinit() {
