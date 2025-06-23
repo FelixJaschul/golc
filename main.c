@@ -51,7 +51,7 @@ void render_grid() {
             else
                 SDL_SetRenderDrawColor(state.renderer, 0, 0, 0, 255);
 
-            SDL_RenderFillRect( state.renderer, &cell);
+            SDL_RenderFillRect(state.renderer, &cell);
         }
     }
 }
@@ -90,7 +90,14 @@ void init() {
     state.window = SDL_CreateWindow("Game of Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE,SDL_WINDOW_SHOWN);
     state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED);
     state.running = true;
-    state.paused = false;
+    state.paused = true;
+
+    // Initialize with a simple pattern (glider)
+    state.grid[1][2] =
+        state.grid[2][3] =
+            state.grid[3][1] =
+                state.grid[3][2] =
+                    state.grid[3][3] = 1;
 }
 
 void deinit() {
@@ -102,19 +109,25 @@ void deinit() {
 
 int main() {
     init();
-    // Initialize with a simple pattern (glider)
-    state.grid[1][2] =
-        state.grid[2][3] =
-            state.grid[3][1] =
-                state.grid[3][2] =
-                    state.grid[3][3] = 1;
-
     while (state.running) {
         SDL_Event ev;
         while (SDL_PollEvent(&ev)) {
-            if (ev.type == SDL_QUIT) state.running = false;
-            if (ev.type == SDL_MOUSEBUTTONDOWN) state.grid[state.mouse.y][state.mouse.x] = 1;
-            if (ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_SPACE) {state.paused = !state.paused; printf("PAUSED"); };
+            switch (ev.type) {
+                case SDL_QUIT:
+                    state.running = false;
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    if (state.grid[state.mouse.y][state.mouse.x]) state.grid[state.mouse.y][state.mouse.x] = 0;
+                    else state.grid[state.mouse.y][state.mouse.x] = 1;
+                    break;
+                case SDL_KEYDOWN:
+                    switch (ev.key.keysym.sym) {
+                        case SDLK_SPACE:
+                            state.paused = !state.paused;
+                            printf("PAUSED");
+                            break;
+                    }
+            }
         }
 
         render_grid();
