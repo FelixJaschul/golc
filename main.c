@@ -85,9 +85,23 @@ void update_grid() {
     }
 }
 
-int main() {
+void init() {
     memset(state.grid, 0, sizeof(state.grid));
+    state.window = SDL_CreateWindow("Game of Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE,SDL_WINDOW_SHOWN);
+    state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED);
+    state.running = true;
+    state.paused = false;
+}
 
+void deinit() {
+    // Clean up
+    SDL_DestroyRenderer(state.renderer);
+    SDL_DestroyWindow(state.window);
+    SDL_Quit();
+}
+
+int main() {
+    init();
     // Initialize with a simple pattern (glider)
     state.grid[1][2] =
         state.grid[2][3] =
@@ -95,11 +109,6 @@ int main() {
                 state.grid[3][2] =
                     state.grid[3][3] = 1;
 
-    state.window = SDL_CreateWindow("Game of Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE,SDL_WINDOW_SHOWN);
-    state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED);
-
-    state.running = true;
-    state.paused = false;
     while (state.running) {
         SDL_Event ev;
         while (SDL_PollEvent(&ev)) {
@@ -115,11 +124,6 @@ int main() {
 
         printf("MOUSE POS: %d / %d \n", state.mouse.x, state.mouse.y);
     }
-
-    // Clean up
-    SDL_DestroyRenderer(state.renderer);
-    SDL_DestroyWindow(state.window);
-    SDL_Quit();
-
+    deinit();
     return 0;
 }
