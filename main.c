@@ -14,6 +14,26 @@ typedef struct State {
 
 state_t state;
 
+int getNeighbors(const int y, const int x) {
+    int neighbors = 0;
+
+    for (int dy = -1; dy <= 1; dy++) {
+        for (int dx = -1; dx <= 1; dx++) {
+            if (dx != 0 || dy != 0) {
+                int ny = y + dy;
+                int nx = x + dx;
+                if (ny >= 0
+                        && ny < HEIGHT
+                        && nx >= 0
+                        && nx < WIDTH) {
+                    neighbors += state.grid[ny][nx];
+                        }
+            }
+        }
+    }
+    return neighbors;
+}
+
 void render_grid() {
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
@@ -36,22 +56,7 @@ void update_grid() {
 
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
-            int neighbors = 0;
-
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dx = -1; dx <= 1; dx++) {
-                    if (dx || dy) {
-                        const int ny = y + dy;
-                        const int nx = x + dx;
-                        if (ny >= 0
-                                && ny < HEIGHT
-                                && nx >= 0
-                                && nx < WIDTH) {
-                            neighbors += state.grid[ny][nx];
-                        }
-                    }
-                }
-            }
+            const int neighbors = getNeighbors(y, x);
 
             // Apply Conway's Game of Life rules
             // 1. Any live cell with 2 or 3 live neighbors survives
@@ -79,7 +84,7 @@ int main() {
                 state.grid[3][2] =
                     state.grid[3][3] = 1;
 
-    state.window = SDL_CreateWindow("GOL", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE,SDL_WINDOW_SHOWN);
+    state.window = SDL_CreateWindow("Game of Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE,SDL_WINDOW_SHOWN);
     state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED);
 
     state.running = true;
