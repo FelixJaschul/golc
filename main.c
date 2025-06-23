@@ -52,7 +52,9 @@ void render_grid() {
 }
 
 void update_grid() {
-    int new_grid[HEIGHT][WIDTH] = {0};
+    // Alloc ram and fill with 0
+    int new_grid[HEIGHT][WIDTH];
+    memset(new_grid, 0, sizeof(new_grid));
 
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
@@ -66,10 +68,9 @@ void update_grid() {
         }
     }
 
+    // Paste updated grid into viewable grid
     for (int y = 0; y < HEIGHT; y++) {
-        for (int x = 0; x < WIDTH; x++) {
-            state.grid[y][x] = new_grid[y][x];
-        }
+        memcpy(state.grid[y], new_grid[y], WIDTH * sizeof(int));
     }
 }
 
