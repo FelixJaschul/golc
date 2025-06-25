@@ -119,63 +119,46 @@ void deinit() {
     SDL_Quit();
 }
 
-int main() {
-    init();
-    while (state.running) {
-        SDL_Event ev;
-        while (SDL_PollEvent(&ev)) {
-            switch (ev.type) {
+void handle_events() {
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+        switch (ev.type) {
+        default: break;
+        case SDL_QUIT:
+            state.running = false;
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            if (state.grid[state.mouse.y][state.mouse.x]) state.grid[state.mouse.y][state.mouse.x] = 0;
+            else state.grid[state.mouse.y][state.mouse.x] = 1;
+            break;
+        case SDL_KEYDOWN:
+            switch (ev.key.keysym.sym) {
             default: break;
-            case SDL_QUIT:
-                state.running = false;
+            case SDLK_SPACE:
+                state.paused = !state.paused;
+                // printf("PAUSED\n");
                 break;
-            case SDL_MOUSEBUTTONDOWN:
-                if (state.grid[state.mouse.y][state.mouse.x]) state.grid[state.mouse.y][state.mouse.x] = 0;
-                else state.grid[state.mouse.y][state.mouse.x] = 1;
+            case SDLK_RETURN:
+                state.paused = !state.paused;
+                update_grid();
+                // printf("UPDATED ONCE\n");
+                state.paused = !state.paused;
                 break;
-            case SDL_KEYDOWN:
-                switch (ev.key.keysym.sym) {
-                default: break;
-                case SDLK_SPACE:
-                    state.paused = !state.paused;
-                    // printf("PAUSED\n");
-                    break;
-                case SDLK_RETURN:
-                    state.paused = !state.paused;
-                    update_grid();
-                    // printf("UPDATED ONCE\n");
-                    state.paused = !state.paused;
-                    break;
-                case SDLK_BACKSPACE:
-                    memset(state.grid, 0, sizeof(state.grid));
-                    // printf("DELETED\n");
-                    break;
-                case SDLK_s:
-                    spawn_ship();
-                    // printf("SPAWNED SHIP");
-                    break;
-                case SDLK_g:
-                    spawn_glider();
-                    // printf("SPAWNED GLIDER");
-                    break;
-                }
-        }
+            case SDLK_BACKSPACE:
+                memset(state.grid, 0, sizeof(state.grid));
+                // printf("DELETED\n");
+                break;
+            case SDLK_s:
+                spawn_ship();
+                // printf("SPAWNED SHIP");
+                break;
+            case SDLK_g:
+                spawn_glider();
+                // printf("SPAWNED GLIDER");
+                break;
+            }
     }
-}
-
-void init() {
-    memset(state.grid, 0, sizeof(state.grid));
-    state.window = SDL_CreateWindow("Game of Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE,SDL_WINDOW_SHOWN);
-    state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED);
-    state.running = true;
-    state.paused = true;
-}
-
-void deinit() {
-    // Clean up
-    SDL_DestroyRenderer(state.renderer);
-    SDL_DestroyWindow(state.window);
-    SDL_Quit();
+    }
 }
 
 int main() {
