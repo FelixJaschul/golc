@@ -88,20 +88,54 @@ void update_grid() {
 }
 
 void spawn_ship() {
-    state.grid[state.mouse.y][state.mouse.x] = 1;
+    const int my = state.mouse.y, mx = state.mouse.x;
+    state.grid[my][mx] = 1;
     for (int dy = 1; dy < 4; dy++) {
         for (int dx = 0; dx < 4; dx++) {
-            state.grid[state.mouse.y + dy][state.mouse.x + dx] = 1;
+            state.grid[my + dy][mx + dx] = 1;
         }
     }
 }
 
 void spawn_glider() {
-    state.grid[state.mouse.y][state.mouse.x] =
-    state.grid[state.mouse.y + 1][state.mouse.x + 1] =
-    state.grid[state.mouse.y + 2][state.mouse.x - 1] =
-    state.grid[state.mouse.y + 2][state.mouse.x] =
-    state.grid[state.mouse.y + 2][state.mouse.x + 1] = 1;
+    const int my = state.mouse.y, mx = state.mouse.x;
+    state.grid[my][mx] =
+    state.grid[my + 1][mx + 1] =
+    state.grid[my + 2][mx - 1] =
+    state.grid[my + 2][mx] =
+    state.grid[my + 2][mx + 1] = 1;
+}
+
+void handle_events() {
+    SDL_Event ev;
+    while (SDL_PollEvent(&ev)) {
+        switch (ev.type) {
+            default: break;
+            case SDL_QUIT:
+                state.running = false; break;
+
+            case SDL_MOUSEBUTTONDOWN:
+                const int my = state.mouse.y, mx = state.mouse.x;
+                state.grid[my][mx] = state.grid[my][mx] == 1? 0 : 1; break;
+
+            case SDL_KEYDOWN:
+                switch (ev.key.keysym.sym) {
+                default: break;
+                case SDLK_SPACE:
+                        state.paused = !state.paused; break;
+                case SDLK_RETURN:
+                        state.paused = !state.paused;
+                        update_grid();
+                        state.paused = !state.paused; break;
+                case SDLK_BACKSPACE:
+                        memset(state.grid, 0, sizeof(state.grid)); break;
+                case SDLK_s:
+                        spawn_ship(); break;
+                case SDLK_g:
+                        spawn_glider(); break;
+                }
+        }
+    }
 }
 
 void init() {
@@ -117,42 +151,6 @@ void deinit() {
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
     SDL_Quit();
-}
-
-void handle_events() {
-    SDL_Event ev;
-    while (SDL_PollEvent(&ev)) {
-        switch (ev.type) {
-        default: break;
-        case SDL_QUIT:
-            state.running = false;
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            state.grid[state.mouse.y][state.mouse.x] = state.grid[state.mouse.y][state.mouse.x] == 1? 0 : 1;
-            break;
-        case SDL_KEYDOWN:
-            switch (ev.key.keysym.sym) {
-            default: break;
-            case SDLK_SPACE:
-                state.paused = !state.paused;
-                break;
-            case SDLK_RETURN:
-                state.paused = !state.paused;
-                update_grid();
-                state.paused = !state.paused;
-                break;
-            case SDLK_BACKSPACE:
-                memset(state.grid, 0, sizeof(state.grid));
-                break;
-            case SDLK_s:
-                spawn_ship();
-                break;
-            case SDLK_g:
-                spawn_glider();
-                break;
-            }
-        }
-    }
 }
 
 int main() {
