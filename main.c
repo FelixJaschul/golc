@@ -11,6 +11,7 @@ typedef struct State {
     int grid[HEIGHT][WIDTH];
     bool running;
     bool paused;
+    bool stress_test;
 
     struct Mouse {
         int x, y;
@@ -77,6 +78,7 @@ void update_grid() {
     SDL_GetMouseState(&mx, &my);
     state.mouse.y = my / CELL_SIZE;
     state.mouse.x = mx / CELL_SIZE;
+    // printf("MOUSE POS: %d / %d\n", state.mouse.x, state.mouse.y);
 
     // Paste updated grid into viewable grid
     if (state.paused) return;
@@ -86,33 +88,20 @@ void update_grid() {
 }
 
 void spawn_ship() {
-    const int x = state.mouse.x;
-    const int y = state.mouse.y;
-
-    state.grid[y][x] =
-    state.grid[y + 1][x] =
-    state.grid[y + 2][x] =
-    state.grid[y + 3][x] =
-    state.grid[y + 1][x + 1] =
-    state.grid[y + 2][x + 1] =
-    state.grid[y + 3][x + 1] =
-    state.grid[y + 1][x + 2] =
-    state.grid[y + 2][x + 2] =
-    state.grid[y + 3][x + 2] =
-    state.grid[y + 1][x + 3] =
-    state.grid[y + 2][x + 3] =
-    state.grid[y + 3][x + 3] = 1;
+    state.grid[state.mouse.y][state.mouse.x] = 1;
+    for (int dy = 1; dy < 4; dy++) {
+        for (int dx = 0; dx < 4; dx++) {
+            state.grid[state.mouse.y + dy][state.mouse.x + dx] = 1;
+        }
+    }
 }
 
 void spawn_glider() {
-    const int x = state.mouse.x;
-    const int y = state.mouse.y;
-
-    state.grid[y][x] =
-    state.grid[y + 1][x + 1] =
-    state.grid[y + 2][x - 1] =
-    state.grid[y + 2][x] =
-    state.grid[y + 2][x + 1] = 1;
+    state.grid[state.mouse.y][state.mouse.x] =
+    state.grid[state.mouse.y + 1][state.mouse.x + 1] =
+    state.grid[state.mouse.y + 2][state.mouse.x - 1] =
+    state.grid[state.mouse.y + 2][state.mouse.x] =
+    state.grid[state.mouse.y + 2][state.mouse.x + 1] = 1;
 }
 
 void init() {
@@ -149,34 +138,55 @@ int main() {
                 default: break;
                 case SDLK_SPACE:
                     state.paused = !state.paused;
-                    printf("PAUSED\n");
+                    // printf("PAUSED\n");
                     break;
                 case SDLK_RETURN:
                     state.paused = !state.paused;
                     update_grid();
-                    printf("UPDATED ONCE\n");
+                    // printf("UPDATED ONCE\n");
                     state.paused = !state.paused;
                     break;
                 case SDLK_BACKSPACE:
                     memset(state.grid, 0, sizeof(state.grid));
-                    printf("DELETED");
+                    // printf("DELETED\n");
                     break;
                 case SDLK_s:
                     spawn_ship();
+                    // printf("SPAWNED SHIP");
                     break;
                 case SDLK_g:
                     spawn_glider();
+                    // printf("SPAWNED GLIDER");
                     break;
                 }
-            }
         }
+    }
+}
+
+void init() {
+    memset(state.grid, 0, sizeof(state.grid));
+    state.window = SDL_CreateWindow("Game of Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE,SDL_WINDOW_SHOWN);
+    state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED);
+    state.running = true;
+    state.paused = true;
+}
+
+void deinit() {
+    // Clean up
+    SDL_DestroyRenderer(state.renderer);
+    SDL_DestroyWindow(state.window);
+    SDL_Quit();
+}
+
+int main() {
+    init();
+    while (state.running) {
+        handle_events();
 
         render_grid();
         SDL_RenderPresent(state.renderer);
         SDL_Delay(200);
         update_grid();
-
-        printf("MOUSE POS: %d / %d\n", state.mouse.x, state.mouse.y);
     }
     deinit();
     return 0;
