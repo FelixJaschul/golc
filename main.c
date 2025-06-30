@@ -116,22 +116,22 @@ void handle_events() {
 
             case SDL_MOUSEBUTTONDOWN:
                 const int my = state.mouse.y, mx = state.mouse.x;
-                state.grid[my][mx] = state.grid[my][mx] == 1? 0 : 1; break;
+                state.grid[my][mx] = state.grid[my][mx] == 1 ? 0 : 1; break;
 
             case SDL_KEYDOWN:
                 switch (ev.key.keysym.sym) {
-                default: break;
-                case SDLK_SPACE:
+                    default: break;
+                    case SDLK_SPACE:
                         state.paused = !state.paused; break;
-                case SDLK_RETURN:
+                    case SDLK_RETURN:
                         state.paused = !state.paused;
                         update_grid();
                         state.paused = !state.paused; break;
-                case SDLK_BACKSPACE:
+                    case SDLK_BACKSPACE:
                         memset(state.grid, 0, sizeof(state.grid)); break;
-                case SDLK_s:
+                    case SDLK_s:
                         spawn_ship(); break;
-                case SDLK_g:
+                    case SDLK_g:
                         spawn_glider(); break;
                 }
         }
