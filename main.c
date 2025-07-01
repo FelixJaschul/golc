@@ -1,5 +1,5 @@
 #include <stdbool.h>
-#include <SDL2/SDL.h>
+#include "SDL2/SDL.h"
 
 #define WIDTH 80
 #define HEIGHT 40
